@@ -1,532 +1,140 @@
-<div align="center">
+# ACE: Autonomous Content Engine
 
-# ✦ ACE: Autonomous Content Engine
+**An agentic, source-grounded generative AI workflow that turns live UAE financial-technology news into publication-ready LinkedIn content, with a human approving every post.**
 
-**Agentic, source-grounded generative AI for UAE FinTech content**
-
-*Research the market. Draft with citations. Keep a human in the loop.*
-
-![Status](https://img.shields.io/badge/status-prototype-2E7D4F?style=flat-square)
-![React](https://img.shields.io/badge/React-TypeScript-14532D?style=flat-square&logo=react&logoColor=white)
-![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%7C%20Edge%20Functions-2E7D4F?style=flat-square&logo=supabase&logoColor=white)
-![LLM](https://img.shields.io/badge/LLM-Gemini%203.6-B7791F?style=flat-square&logo=google&logoColor=white)
-![Cost](https://img.shields.io/badge/pilot%20cost-%E2%82%B90%20(free%20tier)-14532D?style=flat-square)
-
-</div>
+Built during a Generative AI & Automation internship at **Resolutions Infotech LLC** (Dubai, UAE), July to October 2026.
 
 ---
 
-## What is ACE?
+## Why ACE exists
 
-ACE is a full-stack web application that turns public UAE financial-technology news and reports into **cited, on-brand LinkedIn content**. A team of role-specialised AI agents researches sources, chooses what to write about, and drafts posts. A person approves, edits or rejects every draft before anything is published.
+The UAE financial ecosystem moves fast. Regulators, credit bureaus, banks and fintechs publish something new almost every week, and a small company that wants to be visible to banks and lenders has to keep up, stay accurate and sound like itself. Doing that by hand is slow. Using a general-purpose AI writer is fast, but it can state things that cannot be traced to any source, which is not acceptable in finance.
 
-It was built during an internship at **Resolutions Infotech LLC (Dubai, UAE)** as part of a Generative AI and Automation assignment, and documented in an internship report for **Indira Gandhi Delhi Technical University for Women (IGDTUW)**.
+ACE takes a different route: **research first, write second, cite always, and keep a human in charge.**
 
-> **Why it exists.** Language models write fluently but can state things that no source supports (hallucination). ACE is designed so that every draft is tied to a real source, sources carry a trust tier, brand rules constrain the writing, and a human has the final say.
+## What it does
 
-## ✨ Highlights
+- **Watches live sources.** Scans public feeds on UAE banking, the Al Etihad Credit Bureau (AECB), fintech, digital government, AI and cybersecurity.
+- **Filters the noise.** Removes duplicates and ranks each item for relevance.
+- **Picks what to say next.** Chooses the next topic while balancing content pillars.
+- **Writes in the company's voice.** Produces LinkedIn drafts with a hook, body and call-to-action, each anchored to a real, linked source.
+- **Shows its work.** Every draft carries originality, duplicate-risk and tone indicators, and every source carries a trust tag (official issuer or verified media).
+- **Leaves the decision to a person.** Nothing is published without human approval.
 
-| | |
-|---|---|
-| 🔎 **Source-grounded** | Drafts cite the research items they came from; trust tiers separate official sources from media. |
-| 🤖 **Multi-agent workflow** | Separate Research, Strategy and Writer agents, plus a reports-and-notices agent. |
-| 🧠 **ACE Memory** | Brand profile, rules, vocabulary, topics, hooks and publishing history are read before every generation. |
-| ✅ **Human in the loop** | Approve, edit or reject. The model never publishes on its own. |
-| 🛡️ **Quality checks** | Originality, duplicate risk and tone checks before review. |
-| 📊 **Evidence-based refinement** | LinkedIn metrics feed back into topic selection. |
-| 💸 **Free-tier stack** | The whole pilot ran at ₹0. |
-
-## 🏗️ Architecture
+## How it works
 
 ```mermaid
 flowchart LR
-    S[Public UAE sources<br/>banking · credit bureau · fintech<br/>digital government · AI · cyber] --> R[Research Agent<br/>ingest · de-duplicate · rank]
-    R --> N[Reports and Notices<br/>summaries · trust tier]
-    R --> ST[Strategy Agent<br/>pick next topic · balance pillars]
-    ST --> W[Writer Agent<br/>cited drafts · pillar · hook · CTA]
-    M[(ACE Memory<br/>brand · rules · vocabulary<br/>topics · hooks · history)] -.-> ST
+    S[Public sources<br/>UAE institutions, verified media] --> R[Research Agent<br/>scan, de-duplicate, rank]
+    R --> T[Strategy Agent<br/>select topic, balance pillars]
+    T --> W[Writer Agent<br/>cited draft: hook, body, CTA]
+    W --> H{Human review<br/>and approval}
+    H --> L[LinkedIn page]
+    M[(ACE Memory<br/>brand voice, rules, vocabulary, history)] -.-> T
     M -.-> W
-    W --> Q[Quality checks<br/>originality · duplicates · tone]
-    Q --> H{{Human review<br/>approve · edit · reject}}
-    H --> L[LinkedIn]
-    L -. metrics .-> ST
+    L --> A[Analytics review]
+    A -.-> T
 ```
 
-### Lifecycle of an item
+| Stage | Agent | What it does |
+|---|---|---|
+| 1 | **Research Agent** | Scans live feeds, removes duplicates, ranks relevance, summarises reports and notices |
+| 2 | **Strategy Agent** | Selects the next topic and balances content pillars |
+| 3 | **Writer Agent** | Drafts the post from the chosen source in the brand voice |
+| 4 | **Human reviewer** | Approves, edits or rejects before publication |
 
-`Source item` → `Ranked and de-duplicated` → `Topic chosen` → `Draft, cited and quality-checked` → `Human review` → `Published`
+## The application
 
-## 🧩 Operator dashboard
+ACE is a web application with an operator dashboard. The sidebar gives access to:
 
-| Module | What it does |
+| Module | Purpose |
 |---|---|
-| **Dashboard** | Daily overview of drafts, research reports, monitored competitors and upcoming posts. |
-| **Content Studio** | Generate, review and edit drafts with their citations. |
-| **Research Hub** | Store of research reports and signals produced by the research and notices agents. |
-| **Competitor Intelligence** | Track what peer companies publish. |
-| **Content Calendar** | Plan and schedule approved posts. |
-| **Automation** | Scheduled runs and automation settings. |
-| **Settings** | Brand profile, rules and ACE Memory. |
+| **Dashboard** | Drafts ready, research reports, competitors monitored, upcoming posts, recent activity and agent status |
+| **Content Studio** | Enter a topic and generate one or three drafts, each with originality, duplicate and tone scores |
+| **Research Hub** | Ranked research items with relevance scores, key figures, a "So what" explanation, a trust tag and a link to the original document |
+| **Competitor Intelligence** | Posting frequency, topic distribution, hashtags, posting pattern and content mix for tracked organisations |
+| **ACE Memory** | Company profile, brand voice, rules, vocabulary, topics, hooks and history, consulted before every generation |
+| **Content Calendar** | Plan and view upcoming posts |
+| **Automation** | Live pipeline view with status, run time and output for each agent |
+| **Settings** | Application configuration |
 
-<!-- Add screenshots here, e.g.
-<p align="center"><img src="docs/screenshots/dashboard.png" width="80%"></p>
--->
+LinkedIn is the active channel. X/Twitter and a newsletter are shown as upcoming channels.
 
-## 🛠️ Tech stack
+## Design principles
 
-| Layer | Technology |
+1. **Source-grounded.** Every draft links to a real source. No source, no post.
+2. **Human in the loop.** The agents propose, a person decides.
+3. **Brand-conditioned.** Prompts are shaped by a stored memory of the company's mission, products, audience and voice (short posts, one idea per line, under 90 words, a single open-ended question as the call-to-action).
+4. **Structured and validated.** Agents return structured outputs that are validated, and a failed step reports its status instead of breaking the pipeline.
+5. **Transparent.** Quality indicators and trust tags are visible, so a reviewer can judge a draft quickly.
+
+## Results so far
+
+From the LinkedIn page analytics export, covering the ten posts published between 14 September and 5 October 2026:
+
+| Metric | Result |
 |---|---|
-| Front end | React, TypeScript, Vite, Tailwind CSS, shadcn/ui |
-| Back end and data | Supabase: PostgreSQL, authentication, serverless Edge Functions |
-| AI layer | Gemini 3.6, prompted for structured output (no training or fine-tuning) |
-| Channel and analytics | LinkedIn company page and analytics exports |
-| Development | AI-assisted, prompt-driven full-stack development |
+| Posts published | 10 |
+| Impressions | 544 (283 unique) |
+| Clicks | 22 (click-through rate about 4.0%) |
+| Reactions / comments | 9 / 2 |
+| Best reach | 168 impressions (credit-data and responsible-financing post) |
+| Best engagement | A question-style post, about 26.8% engagement rate |
 
-## 🚀 Getting started
+These numbers are small and should be read as an early signal, not proof of impact. The page started with a very small audience, the sample covers only a few weeks, and the export does not include follower counts.
 
-> Check these steps against `package.json` and your environment settings before sharing.
+## Built with
+
+- **Lovable**, an AI-assisted web-app builder, for the full-stack application and dashboard
+- A hosted **large language model** accessed through an API, driven by brand-conditioned prompts and structured outputs
+- Public feeds and official announcements from UAE institutions and verified media as research input
+
+<!-- TODO (Aditi): name the exact LLM/API, database and hosting you used, and the live demo link. -->
+
+## Getting started
+
+<!-- TODO (Aditi): fill in only what is true for your setup. -->
 
 ```bash
-# 1. Clone
-git clone https://github.com/AditiR-21/ACE.git
-cd ACE
+# 1. Clone the repository
+git clone <repository-url>
+cd ace
 
 # 2. Install dependencies
-npm install
+<install command>
 
-# 3. Configure environment
-cp .env.example .env      # then add your Supabase URL and keys, and your Gemini API key
+# 3. Add your environment variables (LLM API key, data-source settings)
+cp .env.example .env
 
 # 4. Run the app
-npm run dev
+<run command>
 ```
 
-Edge Functions and the database schema are managed in Supabase. Add the model API key as a server-side secret, never in front-end code.
+## Limitations
 
-## 📈 Pilot results (LinkedIn, 14 Sep to 11 Oct 2026)
+- Source quality depends on the feeds available, and a reviewer must still check each draft.
+- Only LinkedIn is active.
+- Results come from a small sample over a short period.
 
-A small, uncontrolled pilot on one company page. It supports directional observations, not causal claims.
+## Roadmap
 
-| Posts | Impressions | Clicks | Reactions | Click-through rate |
-|:---:|:---:|:---:|:---:|:---:|
-| 10 | 544 | 22 | 9 | ≈ 4.0% |
+- [ ] Activate the X/Twitter and newsletter channels
+- [ ] Connect to a scheduling and publishing platform so approved posts go out automatically
+- [ ] Feed LinkedIn analytics back into the Strategy Agent so topic choice follows measured engagement
+- [ ] Run for a longer period to measure follower growth and lead generation
 
-The pilot showed which themes drew attention and that an open-ended closing question invites replies.
+## Related work
 
-## 🧭 Roadmap
+The prompt-engineering and robustness questions behind ACE led to two literature studies by the same research team, both submitted in October 2026 and currently under review:
 
-- [ ] Add X/Twitter and a newsletter behind the same approval step
-- [ ] Evaluation harness that scores factual consistency between each draft and its cited source
-- [ ] Scheduled, fully automated runs (with the approval step kept)
-- [ ] Review paid tiers and usage limits before scaling beyond the pilot
+- *Beyond Benchmark Scores: Do LLM-Generated Heuristics Generalize to Unseen Optimization Instances?* (EmergIN 2027)
+- *Does Problem Wording Change Solution Quality? Prompt Invariance in LLM-Based Optimization Modelling* (SocProS 2027)
 
-## 📚 Related research
+## Author
 
-Two literature-synthesis papers on LLM reliability were prepared alongside the project (no new experiments reported):
+**Aditi Rathore**, B.Tech Computer Science and Engineering (Artificial Intelligence), Indira Gandhi Delhi Technical University for Women, New Delhi.
+GitHub: [AditiR-21](https://github.com/AditiR-21)
 
-1. *Beyond Benchmark Scores: Do LLM-Generated Heuristics Generalise to Unseen Optimisation Instances?* (EmergIN 2027, submitted)
-2. *Does Problem Wording Change Solution Quality? Prompt Invariance in LLM-Based Optimisation Modelling* (SocProS 2027, submitted)
+## Acknowledgements
 
-## 👥 Team and mentors
-
-- **Author:** Aditi Rathore, B.Tech CSE (AI), IGDTUW
-- **Co-authors (papers):** Andrea Jomy, Aditi, J. Ida Jemi, Shailesh D. Kamble
-- **University mentor:** Shailesh D. Kamble, Associate Professor, IGDTUW
-- **Company mentor:** Ms. Manisha Singh, Client Account Lead, Resolutions Infotech LLC
-
-## ⚠️ Notes
-
-- ACE is a **prototype**. Dashboard screenshots may show sample data.
-- Content is drafted from public sources only. A person reviews every post before publication.
-- Company-specific material is shared with permission for academic purposes.
-
----
-
-<div align="center">
-
-Built with care in New Delhi and Dubai · © 2026 Aditi Rathore
-
-</div>
-• Dark & Light themes
-
-• Fast dashboard feel
-
-• Clean typography
-
-• Smooth animations
-
-• No clutter
-
-Primary colors:
-
-Blue
-
-White
-
-Dark Gray
-
-Accent:
-
-LinkedIn Blue
-
-──────────────────────────────────────
-
-SIDEBAR
-
-──────────────────────────────────────
-
-🏠 Dashboard
-
-✍ Content Studio
-
-📅 Content Calendar
-
-📰 Research Hub
-
-🏢 Competitors
-
-🧠 Brand Memory
-
-📚 Post History
-
-⚙ Automation
-
-👤 Settings
-
-──────────────────────────────────────
-
-DASHBOARD
-
-──────────────────────────────────────
-
-Cards
-
-• Drafts Ready
-
-• Posts Scheduled
-
-• Research Updates
-
-• Competitors Tracked
-
-Recent Activity Timeline
-
-Upcoming Publishing Calendar
-
-Quick Actions
-
-Generate Posts
-
-Run Research
-
-View Memory
-
-View Drafts
-
-Automation Status
-
-Research Agent
-
-Strategy Agent
-
-Writer Agent
-
-Each agent should display
-
-Idle
-
-Running
-
-Completed
-
-──────────────────────────────────────
-
-CONTENT STUDIO
-
-──────────────────────────────────────
-
-Large Editor
-
-Generated Drafts
-
-Generate 1 Post
-
-Generate 3 Posts
-
-Approve
-
-Reject
-
-Edit
-
-Copy
-
-Export
-
-Each draft displays
-
-Topic
-
-Hook
-
-Body
-
-CTA
-
-Hashtags
-
-Estimated Reading Time
-
-Content Pillar
-
-Duplicate Risk Score
-
-Buttons
-
-Approve
-
-Regenerate
-
-Edit
-
-──────────────────────────────────────
-
-RESEARCH HUB
-
-──────────────────────────────────────
-
-Daily Industry News
-
-Trending Fintech Topics
-
-Latest Regulations
-
-Competitor Highlights
-
-Trending Keywords
-
-Research Summary
-
-Sources Used
-
-Research Date
-
-──────────────────────────────────────
-
-COMPETITORS
-
-──────────────────────────────────────
-
-Track multiple competitors.
-
-For each competitor display
-
-Company
-
-Recent Posting Frequency
-
-Top Topics
-
-Most Used Hashtags
-
-Content Categories
-
-Trending Subjects
-
-──────────────────────────────────────
-
-CONTENT CALENDAR
-
-──────────────────────────────────────
-
-Monthly Calendar
-
-Biweekly Schedule
-
-Draft
-
-Scheduled
-
-Published
-
-Missed
-
-Clicking a date opens the assigned draft.
-
-──────────────────────────────────────
-
-BRAND MEMORY
-
-──────────────────────────────────────
-
-This is the most important page.
-
-Store
-
-Company Name
-
-Mission
-
-Products
-
-Audience
-
-Tone
-
-Writing Style
-
-Preferred CTA
-
-Forbidden Words
-
-Preferred Vocabulary
-
-Competitors
-
-Past Campaigns
-
-Topics Covered
-
-Topics To Avoid
-
-Successful Hooks
-
-Generated Drafts
-
-Approved Drafts
-
-Published Posts
-
-Brand Rules
-
-This memory must be used before generating every new post.
-
-──────────────────────────────────────
-
-POST HISTORY
-
-──────────────────────────────────────
-
-Search
-
-Filters
-
-Published Date
-
-Topic
-
-Status
-
-Performance Placeholder
-
-Duplicate Similarity %
-
-View Previous Versions
-
-──────────────────────────────────────
-
-AUTOMATION PAGE
-
-──────────────────────────────────────
-
-Display a visual workflow.
-
-Research Agent
-
-↓
-
-Strategy Agent
-
-↓
-
-Writer Agent
-
-Each stage should show
-
-Status
-
-Last Run
-
-Current Task
-
-Output Generated
-
-Execution Time
-
-──────────────────────────────────────
-
-SETTINGS
-
-──────────────────────────────────────
-
-Company Profile
-
-Target Audience
-
-Industry
-
-Posting Frequency
-
-Brand Tone
-
-Competitors
-
-Products
-
-LinkedIn Company URL
-
-Publishing Reminder Time
-
-──────────────────────────────────────
-
-WORKFLOW
-
-──────────────────────────────────────
-
-1. Research Agent collects industry trends and competitor insights.
-
-2. Strategy Agent reviews Brand Memory, previous posts, covered topics, and research. It selects the next topic while ensuring diversity and preventing repetition.
-
-3. Writer Agent generates high-quality LinkedIn drafts using the company profile, research, and Brand Memory. It must never repeat previous hooks, CTAs, or substantially similar content.
-
-No automatic LinkedIn posting is included in the MVP. The application prepares content for founder review and manual publishing.
-
-──────────────────────────────────────
-
-IMPORTANT
-
-──────────────────────────────────────
-
-The platform should feel like an AI operating system rather than a content generator.
-
-Every page should appear production-ready.
-
-Include realistic mock data.
-
-Ensure consistent spacing, polished UI components, responsive layouts, empty states, loading states, and subtle transitions.
-
-The overall experience should be impressive enough to demo to investors, hackathon judges, or early customers.
-
-This project was built with [Lovable](https://lovable.dev).
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/9e4d7b5e-ce13-4e22-879f-5955b0e1b0e7).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
-```
-#   A C E 
- 
- 
+Thanks to **Ms. Manisha Singh** and **Resolutions Infotech LLC** for the guidance and the freedom to build this.
